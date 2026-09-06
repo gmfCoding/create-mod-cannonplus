@@ -1,0 +1,104 @@
+plugins {
+    id("java")
+    // legacyforge pinned to the version Create 1.20.1 itself ships with: newer MDG uses a Java-21
+    // NeoForm engine which crashes the old ForgeFlower decompiler used by Forge 1.20.1.
+    id("net.neoforged.moddev.legacyforge") version "2.0.107" // https://projects.neoforged.net/neoforged/ModDevGradle
+}
+
+group = "com.gmfcoding"
+version = mod_version
+
+base {
+    archivesName = "create-cannonplus-${minecraft_version}"
+}
+
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
+}
+
+println("Java: ${System.getProperty("java.version")}, JVM: ${System.getProperty("java.vm.version")} (${System.getProperty("java.vendor")}), Arch: ${System.getProperty("os.arch")}")
+
+// Mixin setup (ModDevGradle legacyForge handles annotation processing + refmap generation).
+def refmap
+mixin {
+    refmap = add(sourceSets.main, "create_cannon_plus.refmap.json")
+    config "create_cannon_plus.mixins.json"
+}
+
+legacyForge {
+    version = "${minecraft_version}-${forge_version}"
+
+    mods {
+        "${mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+    }
+
+    runs {
+        configureEach {
+            systemProperty("mixin.debug.export", "true")
+            systemProperty("mixin.debug.verbose", "true")
+
+            programArgument("-mixin.config=create_cannon_plus.mixins.json")
+        }
+
+        client {
+            client()
+        }
+
+        server {
+            server()
+        }
+    }
+}
+
+repositories {
+    maven { url = "https://maven.createmod.net" } // Create, Ponder, Flywheel
+    maven { url = "https://maven.ithundxr.dev/mirror" } // Registrate
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    // Create + its dev companions (official Create wiki: forge-1.20.1). These load in the dev
+    // run so the client can boot against the real mod; users install Create themselves at runtime.
+    // `mod*` = MDG configurations: on the compile + dev-run classpath, never bundled into our jar.
+    modImplementation("com.simibubi.create:create-${minecraft_version}:${create_version}:slim") {
+        transitive = false
+    }
+    modImplementation("net.createmod.ponder:Ponder-Forge-${minecraft_version}:${ponder_version}")
+    modCompileOnly("dev.engine-room.flywheel:flywheel-forge-api-${minecraft_version}:${flywheel_version}")
+    modRuntimeOnly("dev.engine-room.flywheel:flywheel-forge-${minecraft_version}:${flywheel_version}")
+    modImplementation("com.tterrag.registrate:Registrate:${registrate_version}")
+
+    annotationProcessor "org.spongepowered:mixin:${mixin_version}:processor"
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
+    implementation("io.github.llamalad7:mixinextras-forge:0.4.1")
+}
+
+processResources {
+    var replaceProperties = [
+        mod_id          : mod_id,
+        mod_name        : mod_name,
+        mod_version     : mod_version,
+        mod_author      : mod_author,
+        mod_description : mod_description,
+        mod_license     : mod_license,
+        minecraft_version: minecraft_version,
+        forge_version   : forge_version,
+    ]
+
+    filesMatching(["META-INF/mods.toml"]) {
+        expand(replaceProperties)
+    }
+}
+
+jar {
+    manifest.attributes([
+        "MixinConfigs": "create_cannon_plus.mixins.json",
+    ])
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+}

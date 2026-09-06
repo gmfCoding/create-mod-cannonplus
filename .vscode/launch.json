@@ -1,0 +1,53 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "Client",
+      "presentation": {
+        "group": "Mod Development - create-mod-cannonplus",
+        "order": 0
+      },
+      "projectName": "create-mod-cannonplus",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@G:\\Projects\\Modding\\Minecraft\\create-mod-cannonplus\\build\\moddev\\clientRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@G:\\Projects\\Modding\\Minecraft\\create-mod-cannonplus\\build\\moddev\\clientRunVmArgs.txt",
+        "-Dfml.modFolders\u003dcreate_cannon_plus%%G:\\Projects\\Modding\\Minecraft\\create-mod-cannonplus\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\run",
+      "env": {
+        "MOD_CLASSES": "create_cannon_plus%%G:\\Projects\\Modding\\Minecraft\\create-mod-cannonplus\\bin\\main"
+      },
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    },
+    {
+      "type": "java",
+      "request": "launch",
+      "name": "Server",
+      "presentation": {
+        "group": "Mod Development - create-mod-cannonplus",
+        "order": 1
+      },
+      "projectName": "create-mod-cannonplus",
+      "mainClass": "net.neoforged.devlaunch.Main",
+      "args": [
+        "@G:\\Projects\\Modding\\Minecraft\\create-mod-cannonplus\\build\\moddev\\serverRunProgramArgs.txt"
+      ],
+      "vmArgs": [
+        "@G:\\Projects\\Modding\\Minecraft\\create-mod-cannonplus\\build\\moddev\\serverRunVmArgs.txt",
+        "-Dfml.modFolders\u003dcreate_cannon_plus%%G:\\Projects\\Modding\\Minecraft\\create-mod-cannonplus\\bin\\main"
+      ],
+      "cwd": "${workspaceFolder}\\run",
+      "env": {
+        "MOD_CLASSES": "create_cannon_plus%%G:\\Projects\\Modding\\Minecraft\\create-mod-cannonplus\\bin\\main"
+      },
+      "console": "internalConsole",
+      "shortenCommandLine": "none"
+    }
+  ]
+}
