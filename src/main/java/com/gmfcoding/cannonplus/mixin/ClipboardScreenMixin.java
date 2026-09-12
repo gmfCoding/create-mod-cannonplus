@@ -92,9 +92,11 @@ public class ClipboardScreenMixin {
 			ordinal = 0, remap = true))
 	private int cannonplus$paintOmitted(GuiGraphics graphics, Font font, String text, int x, int y, int color,
 		boolean dropShadow, @Local ClipboardEntry entry) {
-		int width = graphics.drawString(font, text, x, y, color, dropShadow);
+		int width = graphics.drawString(font, text, x, y, color, dropShadow); // Draw the original checkbox glyph
 		if (entry instanceof ClipboardEntryState state && state.cannonplus$getState() == ClipboardEntryState.OMITTED)
-			graphics.drawString(font, "\u2718", x, y - 1, 0xFFE04B4B, false);
+		{
+			graphics.drawString(font, "\u2718", x, y - 1, 0xFFE04B4B, false); // Draw the red cross for omitted entries
+		}
 		return width;
 	}
 
