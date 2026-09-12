@@ -14,9 +14,12 @@ Create's Schematicannon already prints the full material list of a loaded schema
 1. Insert a (blank) **clipboard** into the Schematicannon's list-printer slot while a schematic is loaded.
    The cannon writes a *Schematic Skip List* - one line per block it needs, each with the block's icon and
    required amount. Nothing is pre-checked.
-2. Take the clipboard out and open it (right-click while holding it). **Tick** the blocks you want skipped.
-3. Reinsert the ticked clipboard into the list-printer slot. The cannon now treats it as the active
-   skip list and **will not place** the checked blocks while printing - it skips straight past them.
+2. Take the clipboard out and open it (right-click while holding it). **Click an entry's checkbox** to
+   cycle it through three states: **Incomplete** (no tick) → **Complete** (green tick) → **Omitted**
+   (red cross) → back to Incomplete.
+3. Reinsert the marked clipboard into the list-printer slot. The cannon now treats it as the active
+   skip list and **will not place** any entry marked **Omitted** while printing - it skips straight past
+   those. **Complete** entries stay ticked but are still placed normally.
 
 The skip list stays in the cannon without being consumed, so you can keep tweaking ticks and reinserting.
 Removing the clipboard disables the skip behaviour again.
@@ -29,7 +32,7 @@ A single Mixin into `SchematicannonBlockEntity`:
   tickable, all-unchecked skip list (with an NBT marker) instead of Create's read-only pre-completed list.
 - At the head of `tickPaperPrinter`, a clipboard carrying the marker is treated as configuration: it is
   neither consumed nor reprinted, and the checklist is recomputed once so counts already exclude skipped blocks.
-- In `shouldPlace`, any block whose required item is ticked on the active skip list is skipped.
+- In `shouldPlace`, any block whose required item is marked **Omitted** on the active skip list is skipped.
 
 No new items, blocks, packets or screens - it reuses Create's clipboard + checklist machinery.
 

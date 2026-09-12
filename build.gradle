@@ -88,6 +88,9 @@ processResources {
         forge_version   : forge_version,
     ]
 
+    // Declare the expansion values as inputs so changes (e.g. mod_version) re-run this task.
+    inputs.properties(replaceProperties)
+
     filesMatching(["META-INF/mods.toml"]) {
         expand(replaceProperties)
     }

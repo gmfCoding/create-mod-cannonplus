@@ -5,6 +5,11 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "create_cannon_plus.refmap.json",
   "mixins": [
-    "SchematicannonBlockEntityMixin"
+    "SchematicannonBlockEntityMixin",
+    "ClipboardEntryMixin",
+    "SchematicPrinterMixin"
+  ],
+  "client": [
+    "ClipboardScreenMixin"
   ]
 }

@@ -32,7 +32,8 @@ import net.minecraft.world.level.block.state.BlockState;
  * Helpers for the Schematicannon "block skip list", which lives on a Create clipboard item.
  * <p>
  * The cannon prints one line per needed block onto a clipboard (each with the block's item as icon).
- * The player ticks (checks) the lines they want skipped; the cannon then ignores those blocks while printing.
+ * The player cycles each line between Incomplete, Complete and Omitted; Omitted entries make the cannon
+ * skip that block while printing.
  */
 public final class SkipListClipboards {
 
@@ -54,7 +55,7 @@ public final class SkipListClipboards {
 		return tag != null && tag.getBoolean(MARKER);
 	}
 
-	/** Collects the items the player has ticked on the given skip-list clipboard. */
+	/** Collects the items the player has marked on the given skip-list clipboard. */
 	public static Set<Item> collectSkipped(ItemStack clipboard) {
 		Set<Item> skipped = new HashSet<>();
 		if (!isSkipListClipboard(clipboard))
@@ -65,7 +66,7 @@ public final class SkipListClipboards {
 			if (page == null)
 				continue;
 			for (ClipboardEntry entry : page) {
-				if (entry == null || !entry.checked)
+				if (entry == null || !isSkipped(entry))
 					continue;
 				if (entry.icon == null || entry.icon.isEmpty())
 					continue;
@@ -73,6 +74,14 @@ public final class SkipListClipboards {
 			}
 		}
 		return skipped;
+	}
+
+	/** True only for Omitted entries - Complete entries are still placed normally. */
+	public static boolean isSkipped(ClipboardEntry entry) {
+		int state = entry instanceof ClipboardEntryState entryState
+			? entryState.cannonplus$getState()
+			: (entry.checked ? ClipboardEntryState.COMPLETE : ClipboardEntryState.INCOMPLETE);
+		return state == ClipboardEntryState.OMITTED;
 	}
 
 	/**
@@ -84,8 +93,18 @@ public final class SkipListClipboards {
 		if (skipped.isEmpty())
 			return false;
 
-		ItemRequirement requirement = ItemRequirement.of(state, blockEntity);
-		if (requirement.isEmpty() || requirement.isInvalid())
+		if (AllBlocks.BELT.has(state)) {
+			// A belt position always ends up as a shaft (its pulley) once the belt itself is skipped, so judge belts
+			// by the shaft item only - omitting the belt connector must not remove the pulleys. The belt launch
+			// itself is downgraded to a pulley shaft in SchematicannonBlockEntityMixin.
+			return isRequirementSkipped(skipped, ItemRequirement.of(AllBlocks.SHAFT.getDefaultState(), null));
+		}
+
+		return isRequirementSkipped(skipped, ItemRequirement.of(state, blockEntity));
+	}
+
+	private static boolean isRequirementSkipped(Set<Item> skipped, ItemRequirement requirement) {
+		if (requirement == null || requirement.isEmpty() || requirement.isInvalid())
 			return false;
 
 		for (StackRequirement stackRequirement : requirement.getRequiredItems()) {

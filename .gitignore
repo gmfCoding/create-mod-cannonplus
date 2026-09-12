@@ -28,3 +28,4 @@ out/
 
 # Local compile-only dependency (downloaded by hand from maven.createmod.net)
 libs/*.jar
+.eclipse/
